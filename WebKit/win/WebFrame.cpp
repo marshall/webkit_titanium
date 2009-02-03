@@ -98,11 +98,13 @@
 
 #include <CoreGraphics/CoreGraphics.h>
 
+#if PLATFORM(CG)
 // CG SPI used for printing
 extern "C" {
     CGAffineTransform CGContextGetBaseCTM(CGContextRef c); 
     void CGContextSetBaseCTM(CGContextRef c, CGAffineTransform m); 
 }
+#endif
 
 using namespace WebCore;
 using namespace HTMLNames;
@@ -1813,6 +1815,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::spoolPages(
     headerAndFooterHeights(&headerHeight, &footerHeight);
     GraphicsContext spoolCtx(pctx);
 
+#if PLATFORM(CG)
     for (UINT ii = startPage; ii < endPage; ii++) {
         IntRect pageRect = m_pageRects[ii];
 
@@ -1856,6 +1859,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::spoolPages(
         CGContextEndPage(pctx);
         CGContextRestoreGState(pctx);
     }
+#endif
  
     return S_OK;
 }

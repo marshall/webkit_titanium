@@ -32,7 +32,7 @@
 #include <WebCore/BString.h>
 #pragma warning(pop)
 
-#if USE(CFNETWORK)
+#if ENABLE(SAFARI_INTERFACE)
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
 #endif
 

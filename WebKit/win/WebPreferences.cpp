@@ -46,7 +46,9 @@
 #include <shlobj.h>
 #include <shfolder.h>
 #include <tchar.h>
+#if ENABLE(SAFARI_INTERFACE)
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
+#endif
 #include <wtf/HashMap.h>
 #include <wtf/OwnArrayPtr.h>
 
@@ -966,7 +968,9 @@ HRESULT STDMETHODCALLTYPE WebPreferences::setFontSmoothing(
     setIntegerValue(CFSTR(WebKitFontSmoothingTypePreferenceKey), smoothingType);
     if (smoothingType == FontSmoothingTypeWindows)
         smoothingType = FontSmoothingTypeStandard;
+#if ENABLE(SAFARI_INTERFACE)
     wkSetFontSmoothingLevel((int)smoothingType);
+#endif
     return S_OK;
 }
 

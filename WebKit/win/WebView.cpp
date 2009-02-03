@@ -103,10 +103,18 @@
 #include <JavaScriptCore/InitializeThreading.h>
 #include <JavaScriptCore/JSLock.h>
 #include <JavaScriptCore/JSValue.h>
+
+#if USE(CFNETWORK)
 #include <CFNetwork/CFURLCachePriv.h>
 #include <CFNetwork/CFURLProtocolPriv.h>
+#endif
+
 #include <CoreFoundation/CoreFoundation.h>
+
+#if ENABLE(SAFARI_INTERFACE)
 #include <WebKitSystemInterface/WebKitSystemInterface.h> 
+#endif
+
 #include <wtf/HashSet.h>
 #include <dimm.h>
 #include <oleacc.h>
@@ -125,6 +133,7 @@ static HashSet<WebView*> pendingDeleteBackingStoreSet;
 static String osVersion();
 static String webKitVersion();
 
+#if USE(CFNETWORK)
 typedef CFURLCacheRef (*CopySharedURLCacheFunction)();
 
 static HMODULE findCFNetworkModule()
@@ -138,6 +147,7 @@ static CopySharedURLCacheFunction findCopySharedURLCacheFunction()
 {
     return reinterpret_cast<CopySharedURLCacheFunction>(GetProcAddress(findCFNetworkModule(), "CFURLCacheCopySharedURLCache"));
 }
+#endif
 
 WebView* kit(Page* page)
 {
@@ -381,6 +391,7 @@ void WebView::setCacheModel(WebCacheModel cacheModel)
     if (s_didSetCacheModel && cacheModel == s_cacheModel)
         return;
 
+#if USE(CFNETWORK)
     // Once we require a newer version of CFNetwork with the CFURLCacheCopySharedURLCache function,
     // we can call CFURLCacheCopySharedURLCache directly and eliminate copySharedURLCache.
     static CopySharedURLCacheFunction copySharedURLCache = findCopySharedURLCacheFunction();
@@ -567,6 +578,7 @@ void WebView::setCacheModel(WebCacheModel cacheModel)
     s_didSetCacheModel = true;
     s_cacheModel = cacheModel;
     return;
+#endif
 }
 
 WebCacheModel WebView::cacheModel()
@@ -4238,9 +4250,11 @@ HRESULT updateSharedSettingsFromPreferencesIfNeeded(IWebPreferences* preferences
     if (FAILED(hr))
         return hr;
 
+#if USE(CFNETWORK)
     // Set cookie storage accept policy
     if (CFHTTPCookieStorageRef cookieStorage = currentCookieStorage())
         CFHTTPCookieStorageSetCookieAcceptPolicy(cookieStorage, acceptPolicy);
+#endif
 
     return S_OK;
 }

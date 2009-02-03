@@ -33,6 +33,7 @@
 #include "COMPropertyBag.h"
 #include "EmbeddedWidget.h"
 #include "MarshallingHelpers.h"
+#include "NotImplemented.h"
 #include "WebCachedPagePlatformData.h"
 #include "WebChromeClient.h"
 #include "WebDocumentLoader.h"
@@ -105,6 +106,7 @@ void WebFrameLoaderClient::assignIdentifierToInitialRequest(unsigned long identi
 
 void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(DocumentLoader* loader, unsigned long identifier, const AuthenticationChallenge& challenge)
 {
+#if USE(CFNETWORK)
     ASSERT(challenge.sourceHandle());
 
     WebView* webView = m_webFrame->webView();
@@ -118,6 +120,9 @@ void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(DocumentLoa
     // If the ResourceLoadDelegate doesn't exist or fails to handle the call, we tell the ResourceHandle
     // to continue without credential - this is the best approximation of Mac behavior
     challenge.sourceHandle()->receivedRequestToContinueWithoutCredential(challenge);
+#else
+   notImplemented();
+#endif
 }
 
 void WebFrameLoaderClient::dispatchDidCancelAuthenticationChallenge(DocumentLoader* loader, unsigned long identifier, const AuthenticationChallenge& challenge)
@@ -472,10 +477,12 @@ void WebFrameLoaderClient::savePlatformDataToCachedPage(CachedPage* cachedPage)
     if (!coreFrame)
         return;
 
+#if ENABLE(SAFARI_INTERFACE)
     ASSERT(coreFrame->loader()->documentLoader() == cachedPage->documentLoader());
 
     WebCachedPagePlatformData* webPlatformData = new WebCachedPagePlatformData(static_cast<IWebDataSource*>(getWebDataSource(coreFrame->loader()->documentLoader())));
     cachedPage->setCachedPagePlatformData(webPlatformData);
+#endif
 }
 
 void WebFrameLoaderClient::transitionToCommittedForNewPage()

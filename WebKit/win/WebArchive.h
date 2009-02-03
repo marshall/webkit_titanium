@@ -28,21 +28,29 @@
 
 #include "WebKit.h"
 
+#if USE(CFNETWORK)
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
     class LegacyWebArchive;
 }
+#endif
 
 class WebArchive : public IWebArchive
 {
 public:
     static WebArchive* createInstance();
+#if USE(CFNETWORK)
     static WebArchive* createInstance(PassRefPtr<WebCore::LegacyWebArchive>);
 protected:
     WebArchive(PassRefPtr<WebCore::LegacyWebArchive>);
     ~WebArchive();
+#else
+    WebArchive(int);
+protected:
+    ~WebArchive();
+#endif
 
 public:
     // IUnknown
@@ -78,7 +86,9 @@ public:
 
 protected:
     ULONG m_refCount;
+#if USE(CFNETWORK)
     RefPtr<WebCore::LegacyWebArchive> m_archive;
+#endif
 };
 
 #endif // WebArchive_h

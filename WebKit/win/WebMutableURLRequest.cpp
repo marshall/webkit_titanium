@@ -38,6 +38,8 @@
 #include <WebCore/ResourceHandle.h>
 #pragma warning(pop)
 
+#include <wtf/RetainPtr.h>
+
 using namespace WebCore;
 
 // IWebURLRequest ----------------------------------------------------------------
@@ -367,9 +369,13 @@ HRESULT STDMETHODCALLTYPE WebMutableURLRequest::mutableCopy(
 {
     if (!result)
         return E_POINTER;
+#if USE(CFNETWORK)
     RetainPtr<CFMutableURLRequestRef> mutableRequest(AdoptCF, CFURLRequestCreateMutableCopy(kCFAllocatorDefault, m_request.cfURLRequest()));
     *result = createInstance(ResourceRequest(mutableRequest.get()));
     return S_OK;
+#else
+    return E_NOTIMPL;
+#endif
 }
 
 // IWebMutableURLRequest ----------------------------------------------------

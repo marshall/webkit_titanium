@@ -1,7 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#ifndef APSTUDIO_INVOKED
 #include "autoversion.h"
+#endif
 #include "winres.h"
 
 #ifdef _WIN32

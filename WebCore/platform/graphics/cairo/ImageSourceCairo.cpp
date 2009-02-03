@@ -102,8 +102,10 @@ ImageSource::~ImageSource()
 
 void ImageSource::clear()
 {
-    delete m_decoder;
-    m_decoder = 0;
+    if (m_decoder) {
+        delete m_decoder;
+        m_decoder = 0;
+    }
 }
 
 bool ImageSource::initialized() const

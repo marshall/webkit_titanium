@@ -29,7 +29,10 @@
 
 #include "DOMCoreClasses.h"
 #include "MemoryStream.h"
+
+#if USE(CFNETWORK)
 #include <WebCore/LegacyWebArchive.h>
+#endif
 
 using namespace WebCore;
 
@@ -42,6 +45,7 @@ WebArchive* WebArchive::createInstance()
     return instance;
 }
 
+#if USE(CFNETWORK)
 WebArchive* WebArchive::createInstance(PassRefPtr<LegacyWebArchive> coreArchive)
 {
     WebArchive* instance = new WebArchive(coreArchive);
@@ -57,6 +61,13 @@ WebArchive::WebArchive(PassRefPtr<LegacyWebArchive> coreArchive)
     gClassCount++;
     gClassNameCount.add("WebArchive");
 }
+#else
+WebArchive::WebArchive(int ignore)
+    : m_refCount(0)
+{
+    gClassCount++;
+}
+#endif
 
 WebArchive::~WebArchive()
 {
@@ -118,7 +129,9 @@ HRESULT STDMETHODCALLTYPE WebArchive::initWithNode(
     if (!domNode)
         return E_NOINTERFACE;
 
+#if USE(CFNETWORK)
     m_archive = LegacyWebArchive::create(domNode->node());
+#endif
     
     return S_OK;
 }
@@ -144,6 +157,7 @@ HRESULT STDMETHODCALLTYPE WebArchive::subframeArchives(
 HRESULT STDMETHODCALLTYPE WebArchive::data(
         /* [out, retval] */ IStream** stream)
 {
+#if USE(CFNETWORK)
     RetainPtr<CFDataRef> cfData = m_archive->rawDataRepresentation();
     if (!cfData)
         return E_FAIL;
@@ -153,4 +167,7 @@ HRESULT STDMETHODCALLTYPE WebArchive::data(
     *stream = MemoryStream::createInstance(buffer);
 
     return S_OK;
+#else
+    return E_NOTIMPL;
+#endif
 }

@@ -29,6 +29,7 @@
 #include "WebURLAuthenticationChallengeSender.h"
 
 #include "COMPtr.h"
+#include "NotImplemented.h"
 #include "WebKit.h"
 #include "WebURLAuthenticationChallenge.h"
 #include "WebURLCredential.h"
@@ -100,29 +101,40 @@ ULONG STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::Release(void)
 HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::cancelAuthenticationChallenge(
         /* [in] */ IWebURLAuthenticationChallenge* challenge)
 {
+#if USE(CFNETWORK)
     COMPtr<WebURLAuthenticationChallenge> webChallenge(Query, challenge);
     if (!webChallenge)
         return E_FAIL;
 
     m_handle->receivedCancellation(webChallenge->authenticationChallenge());
     return S_OK;
+#else
+    notImplemented();
+    return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::continueWithoutCredentialForAuthenticationChallenge(
         /* [in] */ IWebURLAuthenticationChallenge* challenge)
 {
+#if USE(CFNETWORK)
     COMPtr<WebURLAuthenticationChallenge> webChallenge(Query, challenge);
     if (!webChallenge)
         return E_FAIL;
 
     m_handle->receivedRequestToContinueWithoutCredential(webChallenge->authenticationChallenge());
     return S_OK;
+#else
+    notImplemented();
+    return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::useCredential(
         /* [in] */ IWebURLCredential* credential, 
         /* [in] */ IWebURLAuthenticationChallenge* challenge)
 {
+#if USE(CFNETWORK)
     COMPtr<WebURLAuthenticationChallenge> webChallenge(Query, challenge);
     if (!webChallenge)
         return E_FAIL;
@@ -133,6 +145,10 @@ HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::useCredential(
 
     m_handle->receivedCredential(webChallenge->authenticationChallenge(), webCredential->credential());
     return S_OK;
+#else
+    notImplemented();
+    return E_FAIL;
+#endif
 }
 
 // WebURLAuthenticationChallengeSender ----------------------------------------------------------------

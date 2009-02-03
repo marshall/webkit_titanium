@@ -27,8 +27,12 @@
 #include "WebKitDLL.h"
 #include "WebCookieManager.h"
 
+#if USE(CFNETWORK)
 #include <CFNetwork/CFHTTPCookiesPriv.h>
 #include <WebCore/CookieStorageWin.h>
+#elif USE(CURL)
+#include "NotImplemented.h"
+#endif
 
 using namespace WebCore;
 
@@ -36,9 +40,13 @@ using namespace WebCore;
 
 WebCookieManager* WebCookieManager::createInstance()
 {
+#if USE(CFNETWORK)
     WebCookieManager* manager = new WebCookieManager;
     manager->AddRef();
     return manager;    
+#else
+   return 0;
+#endif
 }
 
 WebCookieManager::WebCookieManager()
@@ -58,6 +66,7 @@ WebCookieManager::~WebCookieManager()
 
 HRESULT STDMETHODCALLTYPE WebCookieManager::QueryInterface(REFIID riid, void** ppvObject)
 {
+#if USE(CFNETWORK)
     *ppvObject = 0;
     if (IsEqualGUID(riid, IID_IUnknown))
         *ppvObject = static_cast<WebCookieManager*>(this);
@@ -68,6 +77,10 @@ HRESULT STDMETHODCALLTYPE WebCookieManager::QueryInterface(REFIID riid, void** p
 
     AddRef();
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 ULONG STDMETHODCALLTYPE WebCookieManager::AddRef()
@@ -89,16 +102,26 @@ ULONG STDMETHODCALLTYPE WebCookieManager::Release()
 HRESULT STDMETHODCALLTYPE WebCookieManager::cookieStorage( 
     /* [retval][out] */ CFHTTPCookieStorageRef* storage)
 {
-    if (!storage)
+#if USE(CFNETWORK)
+   if (!storage)
         return E_POINTER;
 
     *storage = currentCookieStorage();
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebCookieManager::setCookieStorage( 
     /* [in] */ CFHTTPCookieStorageRef storage)
 {
+#if USE(CFNETWORK)
     setCurrentCookieStorage(storage);
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }

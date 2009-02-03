@@ -30,7 +30,9 @@
 #include "WebView.h"
 
 #include <shlobj.h>
+#if PLATFORM(CG)
 #include <CoreGraphics/CoreGraphics.h>
+#endif
 
 #pragma warning(push, 0) 
 #include <WebCore/ClipboardWin.h>
@@ -46,7 +48,11 @@
 #pragma warning(pop) 
 
 namespace WebCore {
+#if PLATFORM(CG)
     HBITMAP allocImage(HDC dc, IntSize size, CGContextRef *targetRef);
+#elif PLATFORM(CAIRO)
+    HBITMAP allocImage(HDC dc, IntSize size, struct _cairo** targetRef);
+#endif
 }
 
 
@@ -223,7 +229,11 @@ DragImageRef WebDragClient::createDragImageForLink(KURL& url, const String& inLa
         return 0;
     }
 
+#if PLATFORM(CG)
     CGContextRef contextRef;
+#elif PLATFORM(CAIRO)
+    struct _cairo* contextRef;
+#endif
     image = allocImage(workingDC, imageSize, &contextRef);
     if (!image) {
         DeleteDC(workingDC);
@@ -257,7 +267,12 @@ DragImageRef WebDragClient::createDragImageForLink(KURL& url, const String& inLa
     IntPoint textPos(DRAG_LABEL_BORDER_X, DRAG_LABEL_BORDER_Y + labelFont.pixelSize());
     WebCoreDrawDoubledTextAtPoint(context, label, textPos, labelFont, topColor, bottomColor);
 
+#if PLATFORM(CG)
     CGContextRelease(contextRef);
+#elif PLATFORM(CAIRO)
+    cairo_destroy(contextRef);
+#endif
+
     DeleteDC(workingDC);
     ReleaseDC(0, dc);
     return image;

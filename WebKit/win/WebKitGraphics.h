@@ -30,8 +30,13 @@
 
 extern "C" {
 
+#if PLATFORM(CG)
 typedef struct CGColor* CGColorRef;
 typedef struct CGContext* CGContextRef;
+#elif PLATFORM(CAIRO)
+typedef unsigned ColorRef;        // RGBA quadruplet
+typedef struct _cairo* CairoContextRef;
+#endif
 
 typedef wchar_t WCHAR;
 typedef __nullterminated const WCHAR* LPCWSTR;
@@ -49,18 +54,30 @@ struct WebFontDescription {
 struct WebTextRenderInfo
 {
     DWORD structSize;
+#if PLATFORM(CG)
     CGContextRef cgContext;
+#elif PLATFORM(CAIRO)
+    CairoContextRef cgContext;
+#endif
     LPCTSTR text;
     int length;
     POINT pt;
     const WebFontDescription* description;
+#if PLATFORM(CG)
     CGColorRef color;
+#elif PLATFORM(CAIRO)
+    ColorRef color;
+#endif
     int underlinedIndex;
     bool drawAsPassword;
     int overrideSmoothingLevel; // pass in -1 if caller does not want to override smoothing level
     SIZE shadowOffset;
     int shadowBlur;
+#if PLATFORM(CG)
     CGColorRef shadowColor;
+#elif PLATFORM(CAIRO)
+    ColorRef shadowColor;
+#endif
 };
 
 void WebDrawText(WebTextRenderInfo*);

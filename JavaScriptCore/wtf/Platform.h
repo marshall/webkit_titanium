@@ -134,6 +134,7 @@
 #if PLATFORM(MAC)
 #define WTF_PLATFORM_CG 1
 #define WTF_PLATFORM_CI 1
+#define ENABLE_SAFARI_INTERFACE 1
 #endif
 
 /* PLATFORM(SKIA) for Win/Linux, CG/CI for Mac */
@@ -151,6 +152,7 @@
 /* FIXME: This should be changed from a blacklist to a whitelist */
 #if !PLATFORM(MAC) && !PLATFORM(QT) && !PLATFORM(WX) && !PLATFORM(CHROMIUM)
 #define WTF_PLATFORM_CAIRO 1
+#undef ENABLE_VIDEO
 #endif
 
 /* CPU */
@@ -303,6 +305,7 @@
 
 #if PLATFORM(WIN)
 #define WTF_USE_WININET 1
+/* #define WTF_USE_CURL 1 */
 #endif
 
 #if PLATFORM(WX)

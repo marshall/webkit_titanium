@@ -119,6 +119,7 @@ void detachThread(ThreadIdentifier);
 #if USE(PTHREADS)
 typedef pthread_mutex_t PlatformMutex;
 typedef pthread_cond_t PlatformCondition;
+typedef pthread_key_t PlatformThreadStorageKey;
 #elif PLATFORM(GTK)
 typedef GOwnPtr<GMutex> PlatformMutex;
 typedef GOwnPtr<GCond> PlatformCondition;
@@ -138,6 +139,7 @@ struct PlatformCondition {
     HANDLE m_queue;
     HANDLE m_mutex;
 };
+typedef DWORD PlatformThreadStorageKey;
 #else
 typedef void* PlatformMutex;
 typedef void* PlatformCondition;

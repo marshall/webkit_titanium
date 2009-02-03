@@ -38,12 +38,16 @@
 #include "WebURLCredential.h"
 #include "WebURLResponse.h"
 
+#include <wtf/platform.h>
+
 #include <io.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #pragma warning(push, 0)
+#if USE(CFNETWORK)
 #include <WebCore/AuthenticationCF.h>
+#endif
 #include <WebCore/BString.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/ResourceError.h>
@@ -55,6 +59,7 @@
 
 using namespace WebCore;
 
+#if USE(CFNETWORK)
 // CFURLDownload Callbacks ----------------------------------------------------------------
 static void didStartCallback(CFURLDownloadRef download, const void *clientInfo);
 static CFURLRequestRef willSendRequestCallback(CFURLDownloadRef download, CFURLRequestRef request, CFURLResponseRef redirectionResponse, const void *clientInfo);
@@ -74,6 +79,7 @@ static UInt32 BundleMagicNumber = 0xDECAF4EA;
 
 static CFDataRef extractResumeDataFromBundle(const String& bundlePath);
 static HRESULT appendResumeDataToBundle(CFDataRef resumeData, const String& bundlePath);
+#endif
 
 // WebDownload ----------------------------------------------------------------
 
@@ -86,6 +92,7 @@ WebDownload::WebDownload()
 
 void WebDownload::init(ResourceHandle* handle, const ResourceRequest& request, const ResourceResponse& response, IWebDownloadDelegate* delegate)
 {
+#if USE(CFNETWORK)
     m_delegate = delegate ? delegate : DefaultDownloadDelegate::sharedInstance();
     CFURLConnectionRef connection = handle->connection();
     if (!connection) {
@@ -113,10 +120,12 @@ void WebDownload::init(ResourceHandle* handle, const ResourceRequest& request, c
     // Either way, we need to release the connection to balance out ref counts
     handle->releaseConnectionForDownload();
     CFRelease(connection);
+#endif
 }
 
 void WebDownload::init(const KURL& url, IWebDownloadDelegate* delegate)
 {
+#if USE(CFNETWORK)
     m_delegate = delegate ? delegate : DefaultDownloadDelegate::sharedInstance();
     LOG_ERROR("Delegate is %p", m_delegate.get());
 
@@ -133,6 +142,7 @@ void WebDownload::init(const KURL& url, IWebDownloadDelegate* delegate)
     CFURLDownloadScheduleDownloadWithRunLoop(m_download.get(), ResourceHandle::loaderRunLoop(), kCFRunLoopDefaultMode);
 
     LOG(Download, "WebDownload - Initialized download of url %s in WebDownload %p", url.string().utf8().data(), this);
+#endif
 }
 
 WebDownload::~WebDownload()
@@ -206,6 +216,7 @@ HRESULT STDMETHODCALLTYPE WebDownload::initWithRequest(
         /* [in] */ IWebURLRequest* request, 
         /* [in] */ IWebDownloadDelegate* delegate)
 {
+#if USE(CFNETWORK)
     COMPtr<WebMutableURLRequest> webRequest;
     if (!request || FAILED(request->QueryInterface(&webRequest))) {
         LOG(Download, "WebDownload - initWithRequest failed - not a WebMutableURLRequest");    
@@ -237,12 +248,17 @@ HRESULT STDMETHODCALLTYPE WebDownload::initWithRequest(
 
     LOG(Download, "WebDownload - initWithRequest complete, started download of url %s", webRequest->resourceRequest().url().string().utf8().data());
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::initToResumeWithBundle(
         /* [in] */ BSTR bundlePath, 
         /* [in] */ IWebDownloadDelegate* delegate)
 {
+#if USE(CFNETWORK)
     LOG(Download, "Attempting resume of download bundle %s", String(bundlePath, SysStringLen(bundlePath)).ascii().data());
 
     RetainPtr<CFDataRef> resumeData(AdoptCF, extractResumeDataFromBundle(String(bundlePath, SysStringLen(bundlePath))));
@@ -283,6 +299,10 @@ HRESULT STDMETHODCALLTYPE WebDownload::initToResumeWithBundle(
 
     LOG(Download, "WebDownload - initWithRequest complete, resumed download of bundle %s", String(bundlePath, SysStringLen(bundlePath)).ascii().data());
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::canResumeDownloadDecodedWithEncodingMIMEType(
@@ -295,6 +315,7 @@ HRESULT STDMETHODCALLTYPE WebDownload::canResumeDownloadDecodedWithEncodingMIMET
 
 HRESULT STDMETHODCALLTYPE WebDownload::start()
 {
+#if USE(CFNETWORK)
     LOG(Download, "WebDownload - Starting download (%p)", this);
     if (!m_download)
         return E_FAIL;
@@ -305,10 +326,15 @@ HRESULT STDMETHODCALLTYPE WebDownload::start()
     didStart();
 
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::cancel()
 {
+#if USE(CFNETWORK)
     LOG(Download, "WebDownload - Cancelling download (%p)", this);
     if (!m_download)
         return E_FAIL;
@@ -316,10 +342,15 @@ HRESULT STDMETHODCALLTYPE WebDownload::cancel()
     CFURLDownloadCancel(m_download.get());
     m_download = 0;
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::cancelForResume()
 {
+#if USE(CFNETWORK)
     LOG(Download, "WebDownload - Cancelling download (%p), writing resume information to file if possible", this);
     ASSERT(m_download);
     if (!m_download)
@@ -346,21 +377,31 @@ HRESULT STDMETHODCALLTYPE WebDownload::cancelForResume()
 exit:
     m_download = 0;
     return hr;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::deletesFileUponFailure(
         /* [out, retval] */ BOOL* result)
 {
+#if USE(CFNETWORK)
     if (!m_download)
         return E_FAIL;
     *result = CFURLDownloadDeletesUponFailure(m_download.get());
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::bundlePathForTargetPath(
         /* [in] */ BSTR targetPath, 
         /* [out, retval] */ BSTR* bundlePath)
 {
+#if USE(CFNETWORK)
     if (!targetPath)
         return E_INVALIDARG;
 
@@ -376,6 +417,10 @@ HRESULT STDMETHODCALLTYPE WebDownload::bundlePathForTargetPath(
     if (!*bundlePath)
         return E_FAIL;
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::request(
@@ -392,16 +437,22 @@ HRESULT STDMETHODCALLTYPE WebDownload::request(
 HRESULT STDMETHODCALLTYPE WebDownload::setDeletesFileUponFailure(
         /* [in] */ BOOL deletesFileUponFailure)
 {
+#if USE(CFNETWORK)
     if (!m_download)
         return E_FAIL;
     CFURLDownloadSetDeletesUponFailure(m_download.get(), !!deletesFileUponFailure);
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::setDestination(
         /* [in] */ BSTR path, 
         /* [in] */ BOOL allowOverwrite)
 {
+#if USE(CFNETWORK)
     if (!m_download)
         return E_FAIL;
 
@@ -415,6 +466,10 @@ HRESULT STDMETHODCALLTYPE WebDownload::setDestination(
     LOG(Download, "WebDownload - Set destination to %s", m_bundlePath.ascii().data());
 
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 // IWebURLAuthenticationChallengeSender -------------------------------------------------------------------
@@ -422,6 +477,7 @@ HRESULT STDMETHODCALLTYPE WebDownload::setDestination(
 HRESULT STDMETHODCALLTYPE WebDownload::cancelAuthenticationChallenge(
         /* [in] */ IWebURLAuthenticationChallenge*)
 {
+#if USE(CFNETWORK)
     if (m_download) {
         CFURLDownloadCancel(m_download.get());
         m_download = 0;
@@ -433,11 +489,16 @@ HRESULT STDMETHODCALLTYPE WebDownload::cancelAuthenticationChallenge(
     m_delegate->didFailWithError(this, webError.get());
 
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::continueWithoutCredentialForAuthenticationChallenge(
         /* [in] */ IWebURLAuthenticationChallenge* challenge)
 {
+#if USE(CFNETWORK)
     COMPtr<WebURLAuthenticationChallenge> webChallenge(Query, challenge);
     if (!webChallenge)
         return E_NOINTERFACE;
@@ -445,12 +506,17 @@ HRESULT STDMETHODCALLTYPE WebDownload::continueWithoutCredentialForAuthenticatio
     if (m_download)
         CFURLDownloadUseCredential(m_download.get(), 0, webChallenge->authenticationChallenge().cfURLAuthChallengeRef());
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
 HRESULT STDMETHODCALLTYPE WebDownload::useCredential(
         /* [in] */ IWebURLCredential* credential, 
         /* [in] */ IWebURLAuthenticationChallenge* challenge)
 {
+#if USE(CFNETWORK)
     COMPtr<WebURLAuthenticationChallenge> webChallenge(Query, challenge);
     if (!webChallenge)
         return E_NOINTERFACE;
@@ -464,8 +530,13 @@ HRESULT STDMETHODCALLTYPE WebDownload::useCredential(
     if (m_download)
         CFURLDownloadUseCredential(m_download.get(), cfCredential.get(), webChallenge->authenticationChallenge().cfURLAuthChallengeRef());
     return S_OK;
+#else
+   notImplemented();
+   return E_FAIL;
+#endif
 }
 
+#if USE(CFNETWORK)
 // CFURLDownload Callbacks -------------------------------------------------------------------
 void WebDownload::didStart()
 {
@@ -798,3 +869,4 @@ exit:
     fclose(bundle);
     return hr;
 }
+#endif

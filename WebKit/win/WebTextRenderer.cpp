@@ -32,7 +32,9 @@
 #include "WebKitDLL.h"
 
 #include <CoreFoundation/CFString.h>
+#if ENABLE(SAFARI_INTERFACE)
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
+#endif
 #include <wtf/RetainPtr.h>
 
 WebTextRenderer* WebTextRenderer::createInstance()
@@ -90,6 +92,8 @@ HRESULT STDMETHODCALLTYPE WebTextRenderer::registerPrivateFont(
         return E_FAIL;
 
     RetainPtr<CFStringRef> string(AdoptCF, CFStringCreateWithCharacters(0, reinterpret_cast<const UniChar*>(fontFilePath), static_cast<CFIndex>(wcslen(fontFilePath))));
+#if ENABLE(SAFARI_INTERFACE)
     wkAddFontsAtPath(string.get());
+#endif
     return S_OK;
 }

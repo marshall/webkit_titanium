@@ -42,10 +42,14 @@
 #include <WebCore/StringTruncator.h>
 #include <WebCore/WebCoreTextRenderer.h>
 
+#if PLATFORM(CG)
 #include <CoreGraphics/CoreGraphics.h>
+#endif
 #pragma warning(pop)
 
+#if ENABLE(SAFARI_INTERFACE)
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
+#endif
 
 using namespace WebCore;
 
@@ -81,12 +85,20 @@ static Font makeFont(const WebFontDescription& description)
 struct WebTextRenderInfoWithoutShadow
 {
     DWORD structSize;
+#if PLATFORM(CG)
     CGContextRef cgContext;
+#elif PLATFORM(CAIRO)
+    CairoContextRef cgContext;
+#endif
     LPCTSTR text;
     int length;
     POINT pt;
     const WebFontDescription* description;
+#if PLATFORM(CG)
     CGColorRef color;
+#elif PLATFORM(CAIRO)
+    unsigned color;        // RGBA quadruplet
+#endif
     int underlinedIndex;
     bool drawAsPassword;
     int overrideSmoothingLevel; // pass in -1 if caller does not want to override smoothing level
@@ -99,8 +111,10 @@ void WebDrawText(WebTextRenderInfo* info)
 
     int oldFontSmoothingLevel = -1;
     if (info->overrideSmoothingLevel >= 0) {
+#if ENABLE(SAFARI_INTERFACE)
         oldFontSmoothingLevel = wkGetFontSmoothingLevel();
         wkSetFontSmoothingLevel(info->overrideSmoothingLevel);
+#endif
     }
 
     {
@@ -113,15 +127,21 @@ void WebDrawText(WebTextRenderInfo* info)
 
         // Set shadow setting
         if (info->structSize == sizeof(WebTextRenderInfo) &&
+#if PLATFORM(CG)
             (info->shadowOffset.cx || info->shadowOffset.cy || info->shadowBlur || info->shadowColor))
+#elif PLATFORM(CAIRO)
+            (info->shadowOffset.cx || info->shadowOffset.cy || info->shadowBlur))
+#endif
             context.setShadow(info->shadowOffset, info->shadowBlur, info->shadowColor);
 
         WebCoreDrawTextAtPoint(context, drawString, info->pt, makeFont(*(info->description)), info->color, info->underlinedIndex);
         context.restore();
     }
 
+#if ENABLE(SAFARI_INTERFACE)
     if (info->overrideSmoothingLevel >= 0)
         wkSetFontSmoothingLevel(oldFontSmoothingLevel);
+#endif
 }
 
 float TextFloatWidth(LPCTSTR text, int length, const WebFontDescription& description)
