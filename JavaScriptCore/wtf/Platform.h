@@ -159,6 +159,7 @@
 /* FIXME: This should be changed from a blacklist to a whitelist */
 #if !PLATFORM(MAC) && !PLATFORM(QT) && !PLATFORM(WX) && !PLATFORM(CHROMIUM)
 #define WTF_PLATFORM_CAIRO 1
+#undef ENABLE_VIDEO
 #endif
 
 /* CPU */
