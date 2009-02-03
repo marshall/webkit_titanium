@@ -123,7 +123,7 @@ JS_EXPORT JSObjectRef JSContextGetGlobalObject(JSContextRef ctx);
 @param ctx The JSContext whose group you want to get.
 @result ctx's group.
 */
-JS_EXPORT JSContextGroupRef JSContextGetGroup(JSContextRef ctx) AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+JS_EXPORT JSContextGroupRef JSContextGetGroup(JSContextRef ctx);
 
 #ifdef __cplusplus
 }

@@ -603,7 +603,7 @@ void ResourceHandleManager::initializeHandle(ResourceHandle* job)
     ResourceHandleInternal* d = job->getInternal();
     String url = kurl.string();
 
-    if (kurl.isLocalFile()) {
+	if (kurl.isLocalFile() || kurl.protocolIs("app") || kurl.protocolIs("ti") || kurl.protocolIs("app-storage")) {
         String query = kurl.query();
         // Remove any query part sent to a local file.
         if (!query.isEmpty())

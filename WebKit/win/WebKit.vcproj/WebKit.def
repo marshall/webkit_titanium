@@ -12,6 +12,7 @@ EXPORTS
 	    JSClassRelease
 	    JSClassRetain
 	    JSContextGetGlobalObject
+	    JSContextGetGroup
 	    JSEvaluateScript
 	    JSGarbageCollect
 	    JSGlobalContextCreate
