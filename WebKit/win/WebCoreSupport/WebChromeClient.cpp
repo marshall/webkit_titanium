@@ -512,7 +512,7 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame, const String& database
 			if(1) {
 				// FIX for Titanium - Jorge
 				const unsigned long long defaultQuota = 5 * 1024 * 1024; // 5 megabytes should hopefully be enough to test storage support.
-                origin->setQuota(defaultQuota);
+				origin->setQuota(defaultQuota);
 				return;
 			}
 
