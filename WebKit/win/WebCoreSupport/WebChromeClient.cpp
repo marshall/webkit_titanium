@@ -509,6 +509,13 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame, const String& database
         if (uiDelegatePrivate3)
             uiDelegatePrivate3->exceededDatabaseQuota(m_webView, kit(frame), origin.get(), BString(databaseIdentifier));
         else {
+			if(1) {
+				// FIX for Titanium - Jorge
+				const unsigned long long defaultQuota = 5 * 1024 * 1024; // 5 megabytes should hopefully be enough to test storage support.
+                origin->setQuota(defaultQuota);
+				return;
+			}
+
             // FIXME: remove this workaround once shipping Safari has the necessary delegate implemented.
             TCHAR path[MAX_PATH];
             HMODULE safariHandle = GetModuleHandle(TEXT("Safari.exe"));
