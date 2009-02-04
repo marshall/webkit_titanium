@@ -3789,12 +3789,8 @@
 					>
 				</File>
 				<File
-					RelativePath="..\platform\graphics\FontFastPath.cpp"
-				>
-                </File>
-				<File
 					RelativePath="..\platform\graphics\Font.cpp"
-				>
+					>
 					<FileConfiguration
 						Name="Debug|Win32"
 						>
@@ -3886,6 +3882,10 @@
 				</File>
 				<File
 					RelativePath="..\platform\graphics\FontFamily.h"
+					>
+				</File>
+				<File
+					RelativePath="..\platform\graphics\FontFastPath.cpp"
 					>
 				</File>
 				<File
@@ -11327,6 +11327,10 @@
 			</File>
 			<File
 				RelativePath="..\dom\ScriptElement.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dom\ScriptEvaluator.h"
 				>
 			</File>
 			<File

@@ -30,6 +30,7 @@ class CachedScript;
 class Element;
 class ScriptElementData;
 class ScriptSourceCode;
+class ScriptEvaluator;
 
 class ScriptElement {
 public:
@@ -49,6 +50,9 @@ public:
     // A charset for loading the script (may be overridden by HTTP headers or a BOM).
     virtual String scriptCharset() const = 0;
 
+	static void addScriptEvaluator(ScriptEvaluator* evaluator);
+	static WTF::Vector<ScriptEvaluator*> evaluators;
+
 protected:
     // Helper functions used by our parent classes.
     static void insertedIntoDocument(ScriptElementData&, const String& sourceUrl);
@@ -56,6 +60,7 @@ protected:
     static void childrenChanged(ScriptElementData&);
     static void finishParsingChildren(ScriptElementData&, const String& sourceUrl);
     static void handleSourceAttribute(ScriptElementData&, const String& sourceUrl);
+	
 };
 
 // HTML/SVGScriptElement hold this struct as member variable
@@ -67,6 +72,7 @@ public:
 
     bool ignoresLoadRequest() const;
     bool shouldExecuteAsJavaScript() const;
+	ScriptEvaluator* findEvaluator() const;
 
     String scriptContent() const;
     String scriptCharset() const;

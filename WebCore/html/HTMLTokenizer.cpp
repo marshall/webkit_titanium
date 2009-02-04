@@ -44,6 +44,7 @@
 #include "Page.h"
 #include "PreloadScanner.h"
 #include "ScriptController.h"
+#include "ScriptEvaluator.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "SystemTime.h"
@@ -454,7 +455,9 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state)
                 doScriptExec = false;
             } else
 #endif
-            doScriptExec = m_scriptNode->shouldExecuteAsJavaScript();
+			m_scriptEvaluator = m_scriptNode->findEvaluator();
+			m_scriptMimeType = m_scriptNode->type();
+			doScriptExec = m_scriptNode->shouldExecuteAsJavaScript() || (m_scriptEvaluator != NULL);
             m_scriptNode = 0;
         }
     }
@@ -560,7 +563,13 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const ScriptSourceCode& sour
 #endif
 
     m_state = state;
-    m_doc->frame()->loader()->executeScript(sourceCode);
+
+	if (m_scriptEvaluator == NULL) {
+		m_doc->frame()->loader()->executeScript(sourceCode);
+	} else {
+		m_doc->frame()->loader()->executeScript(sourceCode, m_scriptMimeType, m_scriptEvaluator);
+	}
+
     state = m_state;
 
     state.setAllowYield(true);

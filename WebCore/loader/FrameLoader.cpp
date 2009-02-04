@@ -79,6 +79,7 @@
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "ScriptController.h"
+#include "ScriptEvaluator.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "SecurityOrigin.h"
@@ -772,6 +773,29 @@ ScriptValue FrameLoader::executeScript(const String& script, bool forceUserGestu
     return executeScript(ScriptSourceCode(script, forceUserGesture ? KURL() : m_URL));
 }
 
+ScriptValue FrameLoader::executeScript(const ScriptSourceCode& sourceCode, const String& mimeType, ScriptEvaluator *evaluator)
+{
+	if (evaluator == NULL) {
+		return executeScript(sourceCode);
+	}
+
+	if (!m_frame->script()->isEnabled() || m_frame->script()->isPaused())
+        return ScriptValue();
+
+    bool wasRunningScript = m_isRunningScript;
+    m_isRunningScript = true;
+	ScriptValue result = ScriptValue(); // FIXME, we should eventually pull this from the ScriptEvaluator
+	evaluator->evaluate(mimeType, sourceCode);
+
+    if (!wasRunningScript) {
+        m_isRunningScript = false;
+        submitFormAgain();
+        Document::updateDocumentsRendering();
+    }
+
+    return result;
+}
+
 ScriptValue FrameLoader::executeScript(const ScriptSourceCode& sourceCode)
 {
     if (!m_frame->script()->isEnabled() || m_frame->script()->isPaused())
@@ -779,8 +803,7 @@ ScriptValue FrameLoader::executeScript(const ScriptSourceCode& sourceCode)
 
     bool wasRunningScript = m_isRunningScript;
     m_isRunningScript = true;
-
-    ScriptValue result = m_frame->script()->evaluate(sourceCode);
+	ScriptValue result = m_frame->script()->evaluate(sourceCode);
 
     if (!wasRunningScript) {
         m_isRunningScript = false;

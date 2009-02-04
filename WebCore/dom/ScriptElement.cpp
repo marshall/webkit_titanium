@@ -31,6 +31,7 @@
 #include "FrameLoader.h"
 #include "MIMETypeRegistry.h"
 #include "ScriptController.h"
+#include "ScriptEvaluator.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "StringHash.h"
@@ -38,6 +39,13 @@
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
+
+WTF::Vector<ScriptEvaluator*> ScriptElement::evaluators;
+
+void ScriptElement::addScriptEvaluator(ScriptEvaluator* evaluator)
+{
+	evaluators.append(evaluator);
+}
 
 void ScriptElement::insertedIntoDocument(ScriptElementData& data, const String& sourceUrl)
 {
@@ -112,7 +120,7 @@ static bool isSupportedJavaScriptLanguage(const String& language)
         languages.add("jscript");                
     }
 
-    return languages.contains(language);
+	return languages.contains(language);
 }
 
 // ScriptElementData
@@ -161,18 +169,31 @@ void ScriptElementData::requestScript(const String& sourceUrl)
 
 void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode)
 {
-    if (m_evaluated || sourceCode.isEmpty() || !shouldExecuteAsJavaScript())
+    if (m_evaluated || sourceCode.isEmpty())
         return;
 
-    if (Frame* frame = m_element->document()->frame()) {
-        if (!frame->script()->isEnabled())
-            return;
+	if (shouldExecuteAsJavaScript()) {
+		if (Frame* frame = m_element->document()->frame()) {
+			if (!frame->script()->isEnabled())
+				return;
 
-        m_evaluated = true;
+			m_evaluated = true;
 
-        frame->script()->evaluate(sourceCode);
-        Document::updateDocumentsRendering();
-    }
+			frame->script()->evaluate(sourceCode);
+			Document::updateDocumentsRendering();
+		}
+	} else {
+		for (int i = 0; i < ScriptElement::evaluators.size(); i++) {
+			ScriptEvaluator* evaluator = ScriptElement::evaluators.at(i);
+			if (evaluator && evaluator->matchesMimeType(m_scriptElement->typeAttributeValue())) {
+				m_evaluated = true;
+
+				evaluator->evaluate(m_scriptElement->typeAttributeValue(), sourceCode);
+				Document::updateDocumentsRendering();
+				break;
+			}
+		}
+	}
 }
 
 void ScriptElementData::stopLoadRequest()
@@ -226,6 +247,26 @@ bool ScriptElementData::shouldExecuteAsJavaScript() const
 
     // No type or language is specified, so we assume the script to be JavaScript
     return true;
+}
+
+ScriptEvaluator* ScriptElementData::findEvaluator() const
+{
+	String type = m_scriptElement->typeAttributeValue();
+	String language = m_scriptElement->languageAttributeValue();
+
+	for (int i = 0; i < ScriptElement::evaluators.size(); i++) {
+		ScriptEvaluator* evaluator = ScriptElement::evaluators.at(i);
+		if (evaluator) {
+			if (!type.isEmpty() && evaluator->matchesMimeType(type)) {
+				return evaluator;
+			}
+			else if (!language.isEmpty() && evaluator->matchesMimeType(language)) {
+				return evaluator;
+			}
+		}
+	}
+
+	return NULL;
 }
 
 String ScriptElementData::scriptCharset() const

@@ -832,6 +832,14 @@
 				>
 			</File>
 			<File
+ 				RelativePath="..\WebScriptElement.h"
+ 				>
+ 			</File>
+ 			<File
+ 				RelativePath="..\WebScriptEvaluator.h"
+ 				>
+ 			</File>
+ 			<File
 				RelativePath="..\WebScriptObject.h"
 				>
 			</File>
@@ -1044,6 +1052,10 @@
 				>
 			</File>
 			<File
+ 				RelativePath="..\WebScriptElement.cpp"
+ 				>
+ 			</File>
+ 			<File
 				RelativePath="..\WebScriptObject.cpp"
 				>
 			</File>
