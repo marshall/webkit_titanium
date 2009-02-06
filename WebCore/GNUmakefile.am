@@ -638,6 +638,8 @@ webcore_sources += \
 	WebCore/dom/RegisteredEventListener.h \
 	WebCore/dom/ScriptElement.cpp \
 	WebCore/dom/ScriptElement.h \
+	WebCore/dom/ScriptEvaluator.cpp \
+	WebCore/dom/ScriptEvaluator.cpp \
 	WebCore/dom/ScriptExecutionContext.cpp \
 	WebCore/dom/ScriptExecutionContext.h \
 	WebCore/dom/SelectorNodeList.cpp \
