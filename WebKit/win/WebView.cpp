@@ -771,7 +771,9 @@ void WebView::scrollBackingStore(FrameView* frameView, int dx, int dy, const Int
     // Scroll the bitmap.
     RECT scrollRectWin(scrollViewRect);
     RECT clipRectWin(clipRect);
-    ::ScrollDC(bitmapDC, dx, dy, &scrollRectWin, &clipRectWin, updateRegion, 0);
+    // fix for repaint issue - http://jira.appcelerator.org/jira/browse/TI-58
+    ::ScrollWindowEx(m_viewWindow, dx, dy, &scrollRectWin, &clipRectWin, updateRegion, 0, 0);
+    //::ScrollDC(bitmapDC, dx, dy, &scrollRectWin, &clipRectWin, updateRegion, 0);
     RECT regionBox;
     ::GetRgnBox(updateRegion, &regionBox);
 
