@@ -20,5 +20,5 @@ interface IWebScriptEvaluator : IUnknown
 	/*!
 		@method evaluate
 	*/
-	HRESULT evaluate([in] BSTR mimeType, [in] BSTR sourceCode);
+	HRESULT evaluate([in] BSTR mimeType, [in] BSTR sourceCode, [in] int* context);
 }

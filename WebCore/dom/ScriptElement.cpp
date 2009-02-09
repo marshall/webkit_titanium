@@ -187,10 +187,12 @@ void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode)
 			ScriptEvaluator* evaluator = ScriptElement::evaluators.at(i);
 			if (evaluator && evaluator->matchesMimeType(m_scriptElement->typeAttributeValue())) {
 				m_evaluated = true;
-
-				evaluator->evaluate(m_scriptElement->typeAttributeValue(), sourceCode);
-				Document::updateDocumentsRendering();
-				break;
+				
+				if (Frame* frame = m_element->document()->frame()) {
+					evaluator->evaluate(m_scriptElement->typeAttributeValue(), sourceCode, (void*)frame->script()->windowShell()->window()->globalExec());
+					Document::updateDocumentsRendering();
+					break;
+				}
 			}
 		}
 	}

@@ -166,6 +166,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
     , m_parser(new HTMLParser(doc, reportErrors))
     , m_inWrite(false)
     , m_fragment(false)
+	, m_scriptEvaluator(0)
 {
     begin();
 }
@@ -185,6 +186,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
     , m_parser(0)
     , m_inWrite(false)
     , m_fragment(false)
+	, m_scriptEvaluator(0)
 {
     begin();
 }
@@ -203,6 +205,7 @@ HTMLTokenizer::HTMLTokenizer(DocumentFragment* frag)
     , m_parser(new HTMLParser(frag))
     , m_inWrite(false)
     , m_fragment(true)
+	, m_scriptEvaluator(0)
 {
     begin();
 }
@@ -216,7 +219,7 @@ void HTMLTokenizer::reset()
         m_pendingScripts.removeFirst();
         ASSERT(cache()->disabled() || cs->accessCount() > 0);
         cs->removeClient(this);
-    }
+	}
 
     fastFree(m_buffer);
     m_buffer = m_dest = 0;
@@ -234,6 +237,7 @@ void HTMLTokenizer::reset()
     m_doctypeToken.reset();
     m_doctypeSearchCount = 0;
     m_doctypeSecondarySearchCount = 0;
+	m_scriptEvaluator = 0;
     m_hasScriptsWaitingForStylesheets = false;
 }
 
@@ -564,7 +568,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const ScriptSourceCode& sour
 
     m_state = state;
 
-	if (m_scriptEvaluator == NULL) {
+	if (!m_scriptEvaluator) {
 		m_doc->frame()->loader()->executeScript(sourceCode);
 	} else {
 		m_doc->frame()->loader()->executeScript(sourceCode, m_scriptMimeType, m_scriptEvaluator);

@@ -775,7 +775,7 @@ ScriptValue FrameLoader::executeScript(const String& script, bool forceUserGestu
 
 ScriptValue FrameLoader::executeScript(const ScriptSourceCode& sourceCode, const String& mimeType, ScriptEvaluator *evaluator)
 {
-	if (evaluator == NULL) {
+	if (!evaluator) {
 		return executeScript(sourceCode);
 	}
 
@@ -785,7 +785,8 @@ ScriptValue FrameLoader::executeScript(const ScriptSourceCode& sourceCode, const
     bool wasRunningScript = m_isRunningScript;
     m_isRunningScript = true;
 	ScriptValue result = ScriptValue(); // FIXME, we should eventually pull this from the ScriptEvaluator
-	evaluator->evaluate(mimeType, sourceCode);
+	evaluator->evaluate(mimeType, sourceCode, (void*)m_frame->script()->windowShell()->window()->globalExec());
+	
 
     if (!wasRunningScript) {
         m_isRunningScript = false;
