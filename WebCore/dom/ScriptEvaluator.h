@@ -2,7 +2,8 @@
 #define ScriptEvaluator_h
 
 namespace WebCore {
-	class ScriptSourceCode;
+	class String;
+    class ScriptSourceCode;
 
 	class ScriptEvaluator {
 	public:
