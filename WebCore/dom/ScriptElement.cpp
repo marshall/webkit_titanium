@@ -183,7 +183,7 @@ void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode)
 			Document::updateDocumentsRendering();
 		}
 	} else {
-		for (int i = 0; i < ScriptElement::evaluators.size(); i++) {
+		for (size_t i = 0; i < ScriptElement::evaluators.size(); i++) {
 			ScriptEvaluator* evaluator = ScriptElement::evaluators.at(i);
 			if (evaluator && evaluator->matchesMimeType(m_scriptElement->typeAttributeValue())) {
 				m_evaluated = true;
@@ -256,7 +256,7 @@ ScriptEvaluator* ScriptElementData::findEvaluator() const
 	String type = m_scriptElement->typeAttributeValue();
 	String language = m_scriptElement->languageAttributeValue();
 
-	for (int i = 0; i < ScriptElement::evaluators.size(); i++) {
+	for (size_t i = 0; i < ScriptElement::evaluators.size(); i++) {
 		ScriptEvaluator* evaluator = ScriptElement::evaluators.at(i);
 		if (evaluator) {
 			if (!type.isEmpty() && evaluator->matchesMimeType(type)) {
