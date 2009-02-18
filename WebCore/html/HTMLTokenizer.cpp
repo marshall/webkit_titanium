@@ -1995,8 +1995,17 @@ void HTMLTokenizer::notifyFinished(CachedResource*)
         if (errorOccurred)
             EventTargetNodeCast(n.get())->dispatchEventForType(eventNames().errorEvent, true, false);
         else {
-            if (static_cast<HTMLScriptElement*>(n.get())->shouldExecuteAsJavaScript())
+			HTMLScriptElement *el = static_cast<HTMLScriptElement*>(n.get());
+
+			if (el->shouldExecuteAsJavaScript()) {
                 m_state = scriptExecution(sourceCode, m_state);
+			}
+			m_scriptEvaluator = el->findEvaluator();
+			m_scriptMimeType = el->type();
+
+			if (m_scriptEvaluator && m_scriptEvaluator->matchesMimeType(m_scriptMimeType)) {
+				m_state = scriptExecution(sourceCode, m_state);
+			}
             EventTargetNodeCast(n.get())->dispatchEventForType(eventNames().loadEvent, false, false);
         }
 
