@@ -159,6 +159,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
     , m_scriptCodeCapacity(0)
     , m_scriptCodeResync(0)
     , m_executingScript(0)
+		, m_scriptEvaluator(0)
     , m_requestingScript(false)
     , m_hasScriptsWaitingForStylesheets(false)
     , m_timer(this, &HTMLTokenizer::timerFired)
@@ -166,7 +167,6 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
     , m_parser(new HTMLParser(doc, reportErrors))
     , m_inWrite(false)
     , m_fragment(false)
-	, m_scriptEvaluator(0)
 {
     begin();
 }
@@ -179,6 +179,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
     , m_scriptCodeCapacity(0)
     , m_scriptCodeResync(0)
     , m_executingScript(0)
+		, m_scriptEvaluator(0)
     , m_requestingScript(false)
     , m_hasScriptsWaitingForStylesheets(false)
     , m_timer(this, &HTMLTokenizer::timerFired)
@@ -186,7 +187,6 @@ HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
     , m_parser(0)
     , m_inWrite(false)
     , m_fragment(false)
-	, m_scriptEvaluator(0)
 {
     begin();
 }
@@ -198,6 +198,7 @@ HTMLTokenizer::HTMLTokenizer(DocumentFragment* frag)
     , m_scriptCodeCapacity(0)
     , m_scriptCodeResync(0)
     , m_executingScript(0)
+		, m_scriptEvaluator(0)
     , m_requestingScript(false)
     , m_hasScriptsWaitingForStylesheets(false)
     , m_timer(this, &HTMLTokenizer::timerFired)
@@ -205,7 +206,6 @@ HTMLTokenizer::HTMLTokenizer(DocumentFragment* frag)
     , m_parser(new HTMLParser(frag))
     , m_inWrite(false)
     , m_fragment(true)
-	, m_scriptEvaluator(0)
 {
     begin();
 }

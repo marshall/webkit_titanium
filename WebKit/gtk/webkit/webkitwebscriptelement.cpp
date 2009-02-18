@@ -18,7 +18,7 @@ bool EvaluatorAdapter::matchesMimeType(const WebCore::String &mimeType) {
 	return evaluator->matchesMimeType(mimeType.utf8().data());
 }
 
-void EvaluatorAdapter::evaluate(const WebCore::String &mimeType, const WebCore::ScriptSourceCode& sourceCode)
+void EvaluatorAdapter::evaluate(const WebCore::String &mimeType, const WebCore::ScriptSourceCode& sourceCode, void *context)
 {
 	evaluator->evaluate(mimeType.utf8().data(), sourceCode.jsSourceCode().toString().ascii());
 }

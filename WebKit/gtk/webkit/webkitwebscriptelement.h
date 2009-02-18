@@ -17,7 +17,7 @@ public:
 
 	virtual bool matchesMimeType(const WebCore::String &mimeType);
 
-	virtual void evaluate(const WebCore::String &mimeType, const WebCore::ScriptSourceCode& sourceCode);
+	virtual void evaluate(const WebCore::String &mimeType, const WebCore::ScriptSourceCode& sourceCode, void *context);
 
 protected:
 	WebKitWebScriptEvaluator *evaluator;
