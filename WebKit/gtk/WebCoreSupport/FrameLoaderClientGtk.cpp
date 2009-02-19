@@ -252,14 +252,28 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(FramePolicyFunction poli
     (core(m_frame)->loader()->*policyFunction)(PolicyUse);
 }
 
-void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(FramePolicyFunction policyFunction, const NavigationAction&, const ResourceRequest&, PassRefPtr<FormState>, const String&)
+void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(FramePolicyFunction policyFunction, const NavigationAction&, const ResourceRequest& resourceRequest, PassRefPtr<FormState>, const String& frameName)
 {
     ASSERT(policyFunction);
     if (!policyFunction)
         return;
-    // FIXME: I think Qt version marshals this to another thread so when we
-    // have multi-threaded download, we might need to do the same
-    (core(m_frame)->loader()->*policyFunction)(PolicyUse);
+
+    WebKitWebView* webView = getViewFromFrame(m_frame);
+    WebKitNetworkRequest* request = webkit_network_request_new(strdup(resourceRequest.url().string().utf8().data()));
+    WebKitNavigationResponse response;
+    gchar* frame_name = strdup(frameName.utf8().data());
+
+    printf("in-args: %x %x %x\n", (int) m_frame, (int) request, (int) frame_name);
+    g_signal_emit_by_name(webView, "new-window-navigation-requested", m_frame, request, frame_name, &response);
+
+    free(frame_name);
+    g_object_unref(request);
+
+    if (response == WEBKIT_NAVIGATION_RESPONSE_IGNORE) {
+        (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    } else {
+        (core(m_frame)->loader()->*policyFunction)(PolicyUse);
+    }
 }
 
 void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(FramePolicyFunction policyFunction, const NavigationAction& action, const ResourceRequest& resourceRequest, PassRefPtr<FormState>)
@@ -272,6 +286,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(FramePolicyFunct
     WebKitNetworkRequest* request = webkit_network_request_new(resourceRequest.url().string().utf8().data());
     WebKitNavigationResponse response;
 
+    printf("str: %s\n", webkit_network_request_get_uri(request));
     g_signal_emit_by_name(webView, "navigation-requested", m_frame, request, &response);
 
     g_object_unref(request);

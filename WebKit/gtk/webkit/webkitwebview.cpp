@@ -75,6 +75,7 @@ extern "C" {
 enum {
     /* normal signals */
     NAVIGATION_REQUESTED,
+    NEW_WINDOW_NAVIGATION_REQUESTED,
     CREATE_WEB_VIEW,
     WEB_VIEW_READY,
     WINDOW_OBJECT_CLEARED,
@@ -637,6 +638,12 @@ static WebKitNavigationResponse webkit_web_view_real_navigation_requested(WebKit
     return WEBKIT_NAVIGATION_RESPONSE_ACCEPT;
 }
 
+static WebKitNavigationResponse webkit_web_view_real_new_window_navigation_requested(WebKitWebView*, WebKitWebFrame* frame, WebKitNetworkRequest*, gchar*)
+{
+    notImplemented();
+    return WEBKIT_NAVIGATION_RESPONSE_ACCEPT;
+}
+
 static void webkit_web_view_real_window_object_cleared(WebKitWebView*, WebKitWebFrame*, JSGlobalContextRef context, JSObjectRef window_object)
 {
     notImplemented();
@@ -820,6 +827,17 @@ static gboolean webkit_navigation_request_handled(GSignalInvocationHint* ihint, 
     return TRUE;
 }
 
+static gboolean webkit_new_window_navigation_request_handled(GSignalInvocationHint* ihint, GValue* returnAccu, const GValue* handlerReturn, gpointer dummy)
+{
+    int signalHandled = g_value_get_int(handlerReturn);
+    g_value_set_int(returnAccu, signalHandled);
+
+    if (signalHandled != WEBKIT_NAVIGATION_RESPONSE_ACCEPT)
+        return FALSE;
+
+    return TRUE;
+}
+
 static AtkObject* webkit_web_view_get_accessible(GtkWidget* widget)
 {
     WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
@@ -917,6 +935,18 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass)
             G_TYPE_INT, 2,
             G_TYPE_OBJECT,
             G_TYPE_OBJECT);
+
+    webkit_web_view_signals[NEW_WINDOW_NAVIGATION_REQUESTED] = g_signal_new("new-window-navigation-requested",
+            G_TYPE_FROM_CLASS(webViewClass),
+            (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+            G_STRUCT_OFFSET (WebKitWebViewClass, new_window_navigation_requested),
+            webkit_navigation_request_handled,
+            NULL,
+            webkit_marshal_INT__OBJECT_OBJECT_STRING,
+            G_TYPE_INT, 3,
+            G_TYPE_OBJECT,
+            G_TYPE_OBJECT,
+            G_TYPE_STRING);
 
     /**
      * WebKitWebView::window-object-cleared:
@@ -1244,6 +1274,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass)
     webViewClass->create_web_view = webkit_web_view_real_create_web_view;
     webViewClass->web_view_ready = webkit_web_view_real_web_view_ready;
     webViewClass->navigation_requested = webkit_web_view_real_navigation_requested;
+    webViewClass->new_window_navigation_requested = webkit_web_view_real_new_window_navigation_requested;
     webViewClass->window_object_cleared = webkit_web_view_real_window_object_cleared;
     webViewClass->choose_file = webkit_web_view_real_choose_file;
     webViewClass->script_alert = webkit_web_view_real_script_alert;
@@ -2494,6 +2525,11 @@ void webkit_web_view_set_full_content_zoom(WebKitWebView* webView, gboolean zoom
     webkit_web_view_apply_zoom_level(webView, webkit_web_view_get_zoom_level(webView));
 
     g_object_notify(G_OBJECT(webView), "full-content-zoom");
+}
+
+void webkit_web_view_register_url_scheme_as_local(const gchar* scheme)
+{
+    FrameLoader::registerURLSchemeAsLocal(String(scheme, strlen(scheme)));
 }
 
 }
