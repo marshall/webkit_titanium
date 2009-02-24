@@ -671,6 +671,7 @@ static gboolean webkit_web_view_script_dialog(WebKitWebView* webView, WebKitWebF
     GtkWidget* entry = 0;
     gboolean didConfirm = FALSE;
 
+    gdk_threads_enter();
     switch (type) {
     case WEBKIT_SCRIPT_DIALOG_ALERT:
         messageType = GTK_MESSAGE_WARNING;
@@ -727,6 +728,7 @@ static gboolean webkit_web_view_script_dialog(WebKitWebView* webView, WebKitWebF
 
     }
     gtk_widget_destroy(GTK_WIDGET(dialog));
+    gdk_threads_leave();
     return didConfirm;
 }
 
