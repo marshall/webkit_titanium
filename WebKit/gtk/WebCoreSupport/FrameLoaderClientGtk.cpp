@@ -263,7 +263,6 @@ void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(FramePolicyFuncti
     WebKitNavigationResponse response;
     gchar* frame_name = strdup(frameName.utf8().data());
 
-    printf("in-args: %x %x %x\n", (int) m_frame, (int) request, (int) frame_name);
     g_signal_emit_by_name(webView, "new-window-navigation-requested", m_frame, request, frame_name, &response);
 
     free(frame_name);
@@ -286,7 +285,6 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(FramePolicyFunct
     WebKitNetworkRequest* request = webkit_network_request_new(resourceRequest.url().string().utf8().data());
     WebKitNavigationResponse response;
 
-    printf("str: %s\n", webkit_network_request_get_uri(request));
     g_signal_emit_by_name(webView, "navigation-requested", m_frame, request, &response);
 
     g_object_unref(request);
