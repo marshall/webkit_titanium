@@ -24,7 +24,7 @@ try:
 		cygwin_dir = os.path.join('C:', 'cygwin')
 		bash_exe = os.path.join(cygwin_dir, 'bin', 'bash.exe')
 		cygpath_exe = os.path.join(cygwin_dir, 'bin', 'cygpath.exe')
-		workspace_dir = os.environ("WORKSPACE")
+		workspace_dir = os.environ["WORKSPACE"]
 		workspace_cyg_dir = subprocess.Popen([cygpath_exe, "-u", workspace_dir], stdout=PIPE).communicate()[0]
 		subprocess.call([bash_exe, '-c', "%s/WebKitTools/Scripts/build-webkit" % workspace_cyg_dir, "--release", "--cairo-win32"])
 		
