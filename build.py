@@ -19,7 +19,7 @@ try:
 		os.system("make")
 	elif platform is 'osx':
 		# TODO: add logic for 10.4/10.5 build
-		os.system("./WebKitTools/Scripts/build-webkit --release")
+		os.system("./WebKitTools/Scripts/build-webkit --universal --release")
 	elif platform is 'win32':
 		cygwin_dir = 'C:\\cygwin'
 		bash_exe = os.path.join(cygwin_dir, 'bin', 'bash.exe')
