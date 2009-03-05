@@ -29,4 +29,4 @@ try:
 		subprocess.call([bash_exe, '-c', "%s/WebKitTools/Scripts/build-webkit" % workspace_cyg_dir, "--release", "--cairo-win32"])
 		
 except OSError, e:
-	print "Error building: " + e
+	print "Error building: " + str(e)
