@@ -19,7 +19,12 @@ try:
 		os.system("make")
 	elif platform is 'osx':
 		# TODO: add logic for 10.4/10.5 build
-		os.system("./WebKitTools/Scripts/build-webkit --universal --release")
+		# Ported over from the webkit nightly build script, although some parts not included...
+		# They probably should be, but I don't understand what they do yet, --BTH
+		build_flags_common = 'DEBUG_INFORMATION_FORMAT=dwarf-with-dsym STRIP_INSTALLED_PRODUCT=YES DEPLOYMENT_POSTPROCESSING=YES'
+		build_flags_10_4 = 'GCC_VERSION=4.0 SDKROOT=/Developer/SDKs/MacOSX10.4u.sdk MACOSX_DEPLOYMENT_TARGET=10.4 WEBKIT_SYSTEM_INTERFACE_LIBRARY=WebKitSystemInterfaceTiger'
+		build_flags_10_5 = 'SDKROOT=/Developer/SDKs/MacOSX10.5.sdk MACOSX_DEPLOYMENT_TARGET=10.5 WEBKIT_SYSTEM_INTERFACE_LIBRARY=WebKitSystemInterfaceLeopard'
+		os.system("./WebKitTools/Scripts/build-webkit --universal --release " + build_flags_common + " " + build_flags_10_5)
 	elif platform is 'win32':
 		cygwin_dir = 'C:\\cygwin'
 		bash_exe = os.path.join(cygwin_dir, 'bin', 'bash.exe')
