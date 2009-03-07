@@ -22,7 +22,7 @@ try:
 		# Ported over from the webkit nightly build script, although some parts not included...
 		# They probably should be, but I don't understand what they do yet, --BTH
 		build_flags_common = 'DEBUG_INFORMATION_FORMAT=dwarf-with-dsym STRIP_INSTALLED_PRODUCT=YES DEPLOYMENT_POSTPROCESSING=YES'
-		build_flags_10_4 = 'GCC_VERSION=4.0 SDKROOT=/Developer/SDKs/MacOSX10.4u.sdk MACOSX_DEPLOYMENT_TARGET=10.4 WEBKIT_SYSTEM_INTERFACE_LIBRARY=WebKitSystemInterfaceTiger'
+		build_flags_10_4 = 'GCC_VERSION=4.0 SDKROOT=/Developer/SDKs/MacOSX10.4u.sdk MACOSX_DEPLOYMENT_TARGET=10.4 WEBKIT_SYSTEM_INTERFACE_LIBRARY=WebKitSystemInterfaceTiger MAC_OS_X_VERSION_MAJOR=1040 MAC_OS_X_VERSION_ACTUAL=1049'
 		build_flags_10_5 = 'SDKROOT=/Developer/SDKs/MacOSX10.5.sdk MACOSX_DEPLOYMENT_TARGET=10.5 WEBKIT_SYSTEM_INTERFACE_LIBRARY=WebKitSystemInterfaceLeopard'
 		os.system("./WebKitTools/Scripts/build-webkit --universal --release " + build_flags_common + " " + build_flags_10_5)
 	elif platform is 'win32':
