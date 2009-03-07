@@ -2532,4 +2532,10 @@ void webkit_web_view_register_url_scheme_as_local(const gchar* scheme)
     FrameLoader::registerURLSchemeAsLocal(String(scheme, strlen(scheme)));
 }
 
+gchar* webkit_web_view_get_user_agent(WebKitWebView* webView)
+{
+    gchar* ua = g_strdup(webView->priv->mainFrame->priv->client->userAgent(KURL()).utf8().data());
+    return ua;
+}
+
 }
