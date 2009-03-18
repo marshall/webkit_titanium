@@ -41,7 +41,9 @@
 #endif
 
 #if USE(CURL)
+#if PLATFORM(WIN)
 #include <winsock2.h>
+#endif
 #include <curl/curl.h>
 #include "FormDataStreamCurl.h"
 #endif
