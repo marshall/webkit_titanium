@@ -2191,7 +2191,8 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
     WebKitSetWebDatabasesPathIfNecessary();
     WebKitSetApplicationCachePathIfNecessary();
     
-    m_page = new Page(new WebChromeClient(this), new WebContextMenuClient(this), new WebEditorClient(this), new WebDragClient(this), new WebInspectorClient(this));
+	m_webInspectorClient = new WebInspectorClient(this);
+    m_page = new Page(new WebChromeClient(this), new WebContextMenuClient(this), new WebEditorClient(this), new WebDragClient(this), m_webInspectorClient);
 
     BSTR localStoragePath;
     if (SUCCEEDED(m_preferences->localStorageDatabasePath(&localStoragePath))) {
@@ -4934,7 +4935,7 @@ bool WebView::onIMESetContext(WPARAM, LPARAM)
 HRESULT STDMETHODCALLTYPE WebView::inspector(IWebInspector** inspector)
 {
     if (!m_webInspector)
-        m_webInspector.adoptRef(WebInspector::createInstance(this));
+        m_webInspector.adoptRef(WebInspector::createInstance(this, m_webInspectorClient));
 
     return m_webInspector.copyRefTo(inspector);
 }

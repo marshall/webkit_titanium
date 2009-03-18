@@ -32,6 +32,7 @@
 #include "Timer.h"
 #include "ResourceHandleClient.h"
 
+#include <winsock2.h>
 #include <curl/curl.h>
 #include <wtf/Vector.h>
 

@@ -54,4 +54,7 @@ interface IWebInspector : IUnknown
 
     HRESULT isJavaScriptProfilingEnabled(BOOL* isProfilingEnabled);
     HRESULT setJavaScriptProfilingEnabled(BOOL enabled);
+	
+	HRESULT setInspectorURL(BSTR url);
+	HRESULT setLocalizedStringsURL(BSTR url);
 }

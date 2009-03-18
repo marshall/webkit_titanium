@@ -176,12 +176,19 @@ Page* WebInspectorClient::createPage()
     COMPtr<WebMutableURLRequest> request;
     request.adoptRef(WebMutableURLRequest::createInstance());
 
-    RetainPtr<CFURLRef> htmlURLRef(AdoptCF, CFBundleCopyResourceURL(getWebKitBundle(), CFSTR("inspector"), CFSTR("html"), CFSTR("inspector")));
-    if (!htmlURLRef)
-        return 0;
+	CFStringRef urlStringRef = NULL;
+	if (m_inspectorURL.length() == 0) {
+		RetainPtr<CFURLRef> htmlURLRef(AdoptCF, CFBundleCopyResourceURL(getWebKitBundle(), CFSTR("inspector"), CFSTR("html"), CFSTR("inspector")));
+		if (!htmlURLRef)
+		    return 0;
 
-    CFStringRef urlStringRef = ::CFURLGetString(htmlURLRef.get());
-    if (FAILED(request->initWithURL(BString(urlStringRef), WebURLRequestUseProtocolCachePolicy, 60)))
+		urlStringRef = ::CFURLGetString(htmlURLRef.get());
+	}
+	else {
+		urlStringRef = m_inspectorURL.createCFString();
+	}
+
+	if (FAILED(request->initWithURL(BString(urlStringRef), WebURLRequestUseProtocolCachePolicy, 60)))
         return 0;
 
     if (FAILED(m_webView->topLevelFrame()->loadRequest(request.get())))
@@ -193,11 +200,26 @@ Page* WebInspectorClient::createPage()
 
 String WebInspectorClient::localizedStringsURL()
 {
-    RetainPtr<CFURLRef> url(AdoptCF, CFBundleCopyResourceURL(getWebKitBundle(), CFSTR("localizedStrings"), CFSTR("js"), 0));
-    if (!url)
-        return String();
+	if (m_localizedStringsURL.length() == 0) {
+		RetainPtr<CFURLRef> url(AdoptCF, CFBundleCopyResourceURL(getWebKitBundle(), CFSTR("localizedStrings"), CFSTR("js"), 0));
+		if (!url)
+		    return String();
 
-    return CFURLGetString(url.get());
+		return CFURLGetString(url.get());
+	}
+	else {
+		return m_localizedStringsURL;
+	}
+}
+
+void WebInspectorClient::setInspectorURL(const String& url)
+{
+	m_inspectorURL = url;
+}
+
+void WebInspectorClient::setLocalizedStringsURL(const String& url)
+{
+	m_localizedStringsURL = url;
 }
 
 void WebInspectorClient::showWindow()

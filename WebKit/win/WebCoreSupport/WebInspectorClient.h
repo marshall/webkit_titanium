@@ -43,6 +43,9 @@ class WebInspectorClient : public WebCore::InspectorClient, WebCore::WindowMessa
 public:
     WebInspectorClient(WebView*);
 
+	void setInspectorURL(const WebCore::String& url);
+	void setLocalizedStringsURL(const WebCore::String& url);
+	
     // InspectorClient
     virtual void inspectorDestroyed();
 
@@ -93,6 +96,7 @@ private:
     OwnPtr<WebNodeHighlight> m_highlight;
 
     WebCore::String m_inspectedURL;
+	WebCore::String m_inspectorURL, m_localizedStringsURL;
 
     static friend LRESULT CALLBACK WebInspectorWndProc(HWND, UINT, WPARAM, LPARAM);
 };
