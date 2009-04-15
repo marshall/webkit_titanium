@@ -2748,6 +2748,17 @@ HRESULT STDMETHODCALLTYPE WebView::setPreferences(
 
     m_preferences = webPrefs;
 
+	// reset DB local storage path
+    BSTR localStoragePath;
+    if (SUCCEEDED(m_preferences->localStorageDatabasePath(&localStoragePath))) {
+        m_page->settings()->setLocalStorageDatabasePath(String(localStoragePath, SysStringLen(localStoragePath)));
+
+        WebCore::String databasesDirectory = String(localStoragePath, SysStringLen(localStoragePath));
+        WebKitSetWebDatabasesPath(databasesDirectory);
+
+        SysFreeString(localStoragePath);
+    }
+
     if (identifier) {
         WebPreferences::removeReferenceForIdentifier(identifier);
         SysFreeString(identifier);
