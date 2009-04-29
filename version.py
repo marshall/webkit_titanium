@@ -1,2 +1,2 @@
 
-WebkitTitaniumVersion = "0.3.0"
+WebkitTitaniumVersion = "0.4.0"
