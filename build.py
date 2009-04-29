@@ -12,7 +12,7 @@ elif uname_matches('Darwin'):
 elif uname_matches('Linux'):
 	platform = 'linux'
 
-print "Build Webkit_Titanium (%s)..." % platform
+print "Build Webkit_Titanium (%s).." % platform
 try:
 	if platform is 'linux':
 		os.system("./configure")
