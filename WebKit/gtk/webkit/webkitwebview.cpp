@@ -2538,4 +2538,9 @@ gchar* webkit_web_view_get_user_agent(WebKitWebView* webView)
     return ua;
 }
 
+void webkit_titanium_set_inspector_path(const gchar* path)
+{
+    WebKit::InspectorClient::runtimePath = g_strdup(path);
+}
+
 }

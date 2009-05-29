@@ -31,6 +31,7 @@ using namespace WebCore;
 
 namespace WebKit {
 
+gchar* InspectorClient::runtimePath = NULL;
 static void notifyWebViewDestroyed(WebKitWebView* webView, InspectorClient* inspectorClient)
 {
     inspectorClient->webViewDestroyed();
@@ -92,7 +93,15 @@ Page* InspectorClient::createPage()
     g_signal_connect(m_webView, "destroy",
                      G_CALLBACK(notifyWebViewDestroyed), (gpointer)this);
 
-    webkit_web_view_open(m_webView, "file://"DATA_DIR"/webkit-1.0/webinspector/inspector.html");
+    if (runtimePath == NULL)
+        webkit_web_view_open(m_webView, "file://"DATA_DIR"/webkit-1.0/webinspector/inspector.html");
+    else
+    {
+        String inspectorPath("file://");
+        inspectorPath.append(runtimePath);
+        inspectorPath.append("/webinspector/inspector.html");
+        webkit_web_view_open(m_webView, inspectorPath.utf8().data());
+    }
     gtk_widget_show(GTK_WIDGET(m_webView));
 
     return core(m_webView);

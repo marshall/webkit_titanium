@@ -292,6 +292,9 @@ webkit_web_view_register_url_scheme_as_local    (const gchar          *scheme);
 WEBKIT_API gchar*
 webkit_web_view_get_user_agent                  (WebKitWebView        *web_view);
 
+WEBKIT_API void
+webkit_titanium_set_inspector_path              (const gchar          *path);
+
 G_END_DECLS
 
 #endif
