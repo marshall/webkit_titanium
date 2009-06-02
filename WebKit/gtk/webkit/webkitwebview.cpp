@@ -64,6 +64,7 @@
 #include <wtf/GOwnPtr.h>
 
 #include <gdk/gdkkeysyms.h>
+#include "FrameLoaderClientGtk.h"
 
 static const double defaultDPI = 96.0;
 
@@ -798,7 +799,6 @@ static void webkit_web_view_finalize(GObject* object)
     g_object_unref(priv->webSettings);
     g_object_unref(priv->webInspector);
     g_object_unref(priv->webWindowFeatures);
-    g_object_unref(priv->mainFrame);
     g_object_unref(priv->imContext);
     gtk_target_list_unref(priv->copy_target_list);
     gtk_target_list_unref(priv->paste_target_list);
@@ -2534,7 +2534,8 @@ void webkit_web_view_register_url_scheme_as_local(const gchar* scheme)
 
 gchar* webkit_web_view_get_user_agent(WebKitWebView* webView)
 {
-    gchar* ua = g_strdup(webView->priv->mainFrame->priv->client->userAgent(KURL()).utf8().data());
+    WebCore::String sua = WebKit::FrameLoaderClient::composeUserAgent();
+    gchar* ua = g_strdup(sua.utf8().data());
     return ua;
 }
 

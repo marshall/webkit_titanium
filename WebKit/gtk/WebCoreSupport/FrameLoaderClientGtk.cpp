@@ -106,7 +106,7 @@ static String agentOS()
 #endif
 }
 
-static String composeUserAgent()
+String FrameLoaderClient::composeUserAgent()
 {
     // This is a liberal interpretation of http://www.mozilla.org/build/revised-user-agent-strings.html
     // See also http://developer.apple.com/internet/safari/faq.html#anchor2
@@ -233,6 +233,7 @@ void FrameLoaderClient::postProgressFinishedNotification()
 
 void FrameLoaderClient::frameLoaderDestroyed()
 {
+    webkit_web_frame_core_frame_gone(m_frame);
     g_object_unref(m_frame);
     m_frame = 0;
     delete this;
@@ -312,15 +313,19 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(const KURL& url, const String& 
 {
     Frame* coreFrame = core(webFrame());
 
-    ASSERT(core(getViewFromFrame(webFrame())) == coreFrame->page());
-    WebKitWebFrame* gtkFrame = WEBKIT_WEB_FRAME(webkit_web_frame_init_with_web_view(getViewFromFrame(webFrame()), ownerElement));
-    RefPtr<Frame> childFrame(adoptRef(core(gtkFrame)));
+
+    RefPtr<Frame> childFrame = webkit_web_frame_init_with_web_view(getViewFromFrame(webFrame()), ownerElement);
 
     coreFrame->tree()->appendChild(childFrame);
 
     childFrame->tree()->setName(name);
     childFrame->init();
-    childFrame->loader()->loadURL(url, referrer, String(), FrameLoadTypeRedirectWithLockedHistory, 0, 0);
+
+    // The creation of the frame may have run arbitrary JavaScript that removed it from the page already.
+    if (!childFrame->page())
+        return 0;
+
+    childFrame->loader()->loadURLIntoChildFrame(url, referrer, childFrame.get());
 
     // The frame's onload handler may have removed it from the document.
     if (!childFrame->tree()->parent())
