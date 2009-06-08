@@ -568,10 +568,11 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const ScriptSourceCode& sour
 
     m_state = state;
 
-	if (!m_scriptEvaluator) {
+	if (!m_scriptEvaluator || m_scriptMimeType.length() == 0 || !m_scriptEvaluator->matchesMimeType(m_scriptMimeType)) {
 		m_doc->frame()->loader()->executeScript(sourceCode);
 	} else {
 		m_doc->frame()->loader()->executeScript(sourceCode, m_scriptMimeType, m_scriptEvaluator);
+		m_scriptMimeType = "";
 	}
 
     state = m_state;
@@ -2005,6 +2006,7 @@ void HTMLTokenizer::notifyFinished(CachedResource*)
 
 			if (m_scriptEvaluator && m_scriptEvaluator->matchesMimeType(m_scriptMimeType)) {
 				m_state = scriptExecution(sourceCode, m_state);
+				m_scriptMimeType = "";
 			}
             EventTargetNodeCast(n.get())->dispatchEventForType(eventNames().loadEvent, false, false);
         }

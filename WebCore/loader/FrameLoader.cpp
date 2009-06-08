@@ -775,7 +775,7 @@ ScriptValue FrameLoader::executeScript(const String& script, bool forceUserGestu
 
 ScriptValue FrameLoader::executeScript(const ScriptSourceCode& sourceCode, const String& mimeType, ScriptEvaluator *evaluator)
 {
-	if (!evaluator) {
+	if (!evaluator || mimeType.length() == 0) {
 		return executeScript(sourceCode);
 	}
 
